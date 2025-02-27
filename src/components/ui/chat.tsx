@@ -12,6 +12,9 @@ interface Message {
   content: string;
   sender: 'user' | 'ai';
   timestamp: Date;
+  isTyping?: boolean;
+  words?: string[];
+  currentWordIndex?: number;
 }
 
 interface ChatUIProps {
@@ -57,8 +60,8 @@ export function ChatUI({
   };
 
   return (
-    <div className={cn('flex flex-col h-full', className)}>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className={cn('flex flex-col h-full max-h-[80vh]', className)}>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-emerald-500/20 scrollbar-track-transparent">
         <AnimatePresence>
           {messages.map((message) => (
             <motion.div
@@ -79,7 +82,15 @@ export function ChatUI({
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
                 )}
               >
-                <p className="text-sm">{message.content}</p>
+                <p className="text-sm">
+                  {message.isTyping ? (
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce" />
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-100" />
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-200" />
+                    </span>
+                  ) : message.content}
+                </p>
                 <span className="text-xs opacity-50">
                   {message.timestamp.toLocaleTimeString()}
                 </span>

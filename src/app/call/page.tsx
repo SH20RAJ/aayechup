@@ -14,7 +14,7 @@ function CallContent() {
     const [isVideoOn, setIsVideoOn] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
     const [isConnecting, setIsConnecting] = useState(true);
-    const searchParams = useSearchParams();
+     const searchParams = useSearchParams();
     const router = useRouter();
     const personality_id = searchParams.get('personality');
 

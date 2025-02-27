@@ -38,7 +38,7 @@ export async function POST(request: Request) {
         }
 
         const systemPrompt = personality
-            ? `You are ${personality.name}, ${personality.role + personality.description }. Your traits include being ${personality.traits.join(', ')}. Always stay in character and respond as ${personality.name} would, incorporating your role and personality traits naturally in your responses.`
+            ? `You are ${personality.name}, ${personality.role + personality.description }. Your traits include being ${personality.traits.join(', ')}. Always stay in character and respond as ${personality.name} would, incorporating your role and personality traits naturally in your responses. Humanly responses.`
             : 'You are a helpful AI assistant. Provide clear, accurate, and engaging responses.';
         console.log(systemPrompt);
 
