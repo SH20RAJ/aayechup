@@ -63,7 +63,7 @@ export default function Home() {
         {/* Search Bar */}
         <div className="relative mb-4">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400" />
+            <Search className="h-5 w-5 text-gray-400 stroke-2" />
           </div>
           <input
             type="text"
