@@ -14,7 +14,7 @@ export const personalities: Personality[] = [
       id: '1',
       name: 'Dr. Sanjeev Kumar',
       description: 'Experienced cardiologist with 15+ years of practice.',
-      avatar: 'https://api.dicebear.com/6.x/avataaars/svg?seed=doctor1',
+      avatar: 'https://www.svgrepo.com/show/396621/health-worker.svg',
       traits: ['Professional', 'Caring', 'Expert'],
       phone: '+91 98765 43210',
       role: 'Cardiologist'

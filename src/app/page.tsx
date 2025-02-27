@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { Search, Star, Clock, Phone } from 'lucide-react';
+import { Search, Star, Clock, Phone, PhoneCall, Video } from 'lucide-react';
 
 import { personalities, Personality } from '@/constants/personalities';
 
@@ -53,8 +52,8 @@ export default function Home() {
   const displayedPersonalities = selectedTab === 'favorites'
     ? filteredPersonalities.filter(p => favorites.includes(p.id))
     : selectedTab === 'recents'
-    ? filteredPersonalities.filter(p => recents.includes(p.id))
-    : filteredPersonalities;
+      ? filteredPersonalities.filter(p => recents.includes(p.id))
+      : filteredPersonalities;
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-emerald-900 via-emerald-950 to-gray-950 flex flex-col">
@@ -107,19 +106,24 @@ export default function Home() {
               key={personality.id}
               className="flex items-center gap-4 p-3 hover:bg-black/20 rounded-xl transition-colors"
             >
-              <div className="relative w-12 h-12 rounded-full overflow-hidden border border-emerald-400/30">
-                <Image
-                  src={"/logo.png"}
+              <div
+                onClick={() => handleStartCall(personality)}
+
+                className=" cursor-pointer relative w-12 h-12 rounded-full overflow-hidden border border-emerald-400/30">
+                <img
+                  src={personality.avatar}
                   alt={personality.name}
-                  fill
-                  className="object-cover"
+                  className="object-cover bg-white"
                 />
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 cursor-pointer"
+                onClick={() => handleStartCall(personality)}
+              >
                 <h3 className="text-white font-medium">{personality.name}</h3>
                 <p className="text-gray-400 text-sm">{personality.role}</p>
                 <p className="text-gray-400 text-sm">{personality.phone}</p>
               </div>
+
               <div className="flex gap-2">
                 <button
                   onClick={() => toggleFavorite(personality.id)}
@@ -129,9 +133,16 @@ export default function Home() {
                 </button>
                 <Button
                   onClick={() => handleStartCall(personality)}
-                  className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-full px-6"
+                  className="p-2 h-8 w-8 rounded-full bg-emerald-500"
                 >
-                  Call
+                  <PhoneCall size={16} />
+                </Button>
+
+                <Button
+                  disabled
+                  className="p-2 h-8 w-8 rounded-full"
+                >
+                  <Video size={16} />
                 </Button>
               </div>
             </motion.div>
