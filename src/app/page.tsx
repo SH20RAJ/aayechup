@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { Search, Star, Clock, Phone, PhoneCall, Video } from 'lucide-react';
+import { Search, Star, Clock, Phone, PhoneCall, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { personalities, Personality } from '@/constants/personalities';
 
@@ -141,10 +141,10 @@ export default function Home() {
                 </Button>
 
                 <Button
-                  disabled
-                  className="p-2 h-8 w-8 rounded-full"
+                  onClick={() => router.push(`/chat?personality=${personality.id}`)}
+                  className="p-2 h-8 w-8 rounded-full bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
                 >
-                  <Video size={16} />
+                  <MessageCircle size={16} />
                 </Button>
               </div>
             </motion.div>
