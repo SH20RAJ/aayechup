@@ -207,7 +207,3 @@ export default function CallPage() {
         </Suspense>
     );
 }
-
-export const viewport = {
-    themeColor: '#065f46'
-};

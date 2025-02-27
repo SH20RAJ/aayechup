@@ -9,11 +9,18 @@ import { ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { personalities } from '@/constants/personalities';
 
+import { Personality } from '@/constants/personalities';
+
 interface Message {
     id: string;
     content: string;
     sender: 'user' | 'ai';
     timestamp: Date;
+}
+
+interface ChatResponse {
+    message: string;
+    error?: string;
 }
 
 function ChatContent() {
@@ -23,13 +30,13 @@ function ChatContent() {
     const router = useRouter();
     const personality_id = searchParams.get('personality');
 
-    const personality = personalities.find(p => p.id === personality_id);
+    const personality: Personality | undefined = personalities.find(p => p.id === personality_id);
 
     const handleBack = () => {
         router.push('/');
     };
 
-    const handleSendMessage = (content: string) => {
+    const handleSendMessage = async (content: string) => {
         const newMessage: Message = {
             id: Date.now().toString(),
             content,
@@ -39,16 +46,45 @@ function ChatContent() {
 
         setMessages(prev => [...prev, newMessage]);
 
-        // Simulate AI response
-        setTimeout(() => {
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messages: [...messages, newMessage].map(msg => ({
+                        content: msg.content,
+                        sender: msg.sender
+                    })),
+                    personality: personality
+                })
+            });
+
+            const data = await response.json() as ChatResponse;
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to get AI response');
+            }
+
             const aiResponse: Message = {
                 id: (Date.now() + 1).toString(),
-                content: `${personality?.name || 'AI'} response: I received your message - "${content}"`,
+                content: data.message,
                 sender: 'ai',
                 timestamp: new Date()
             };
+
             setMessages(prev => [...prev, aiResponse]);
-        }, 1000);
+        } catch (error) {
+            console.error('Error getting AI response:', error);
+            const errorMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                content: 'Sorry, I encountered an error. Please try again.',
+                sender: 'ai',
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, errorMessage]);
+        }
     };
 
     const handleStartRecording = () => {
@@ -139,7 +175,3 @@ export default function ChatPage() {
         </AnimatePresence>
     );
 }
-
-export const viewport = {
-    themeColor: '#065f46'
-};
