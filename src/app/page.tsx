@@ -109,7 +109,7 @@ export default function Home() {
             >
               <div className="relative w-12 h-12 rounded-full overflow-hidden border border-emerald-400/30">
                 <Image
-                  src={personality.avatar}
+                  src={"/logo.png"}
                   alt={personality.name}
                   fill
                   className="object-cover"

@@ -13,9 +13,9 @@ export default function CallPage() {
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(false);
   const searchParams = useSearchParams();
-  const id = searchParams.get('id');
+  const personality_id = searchParams.get('personality');
   
-  const personality = personalities.find(p => p.id === id);
+  const personality = personalities.find(p => p.id === personality_id);
 
   if (!personality) {
     return (
@@ -60,6 +60,7 @@ export default function CallPage() {
             alt={personality.name}
             fill
             className="object-cover"
+            unoptimized
           />
         </div>
         <motion.div
