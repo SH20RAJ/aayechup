@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Search, Star, Clock, Phone, PhoneCall, Video } from 'lucide-react';
-
+import { useRouter } from 'next/navigation';
 import { personalities, Personality } from '@/constants/personalities';
 
 export default function Home() {
@@ -39,9 +39,11 @@ export default function Home() {
     localStorage.setItem('recents', JSON.stringify(newRecents));
   };
 
+  const router = useRouter();
+
   const handleStartCall = (personality: Personality) => {
     addToRecents(personality.id);
-    window.location.href = `/call?personality=${personality.id}`;
+    router.push(`/call?personality=${personality.id}`);
   };
 
   const filteredPersonalities = personalities.filter(p =>
