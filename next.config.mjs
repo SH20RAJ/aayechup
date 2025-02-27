@@ -1,3 +1,13 @@
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
+import withPWAInit from "@ducanh2912/next-pwa";
+
+/** @type {import('next').NextConfig} */
+
+const withPWA = withPWAInit({
+  dest: "public",
+  disable: process.env.NODE_ENV === "development", // Disable PWA for development
+});
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -16,10 +26,8 @@ const nextConfig = {
   },
 };
 
-// Import statements should be at the top of the file
-import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
-
 // Initialize Cloudflare for development
 initOpenNextCloudflareForDev();
 
-export default nextConfig;
+
+export default withPWA(nextConfig);

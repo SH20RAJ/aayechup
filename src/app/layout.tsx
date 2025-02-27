@@ -43,7 +43,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en"
+    className=" bg-emerald-800 bg-gradient-to-b from-emerald-900 via-emerald-950 to-gray-950 "
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
