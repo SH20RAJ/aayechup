@@ -8,12 +8,14 @@ import { Video, Mic, Share2, Volume2, PhoneOff, MoreHorizontal, ArrowLeft, Minim
 import { motion, AnimatePresence } from 'framer-motion';
 import { personalities } from '@/constants/personalities';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { CallAudio } from '@/components/ui/call-audio';
 
 function CallContent() {
     const [isMuted, setIsMuted] = useState(false);
     const [isVideoOn, setIsVideoOn] = useState(false);
     const [isMinimized, setIsMinimized] = useState(false);
     const [isConnecting, setIsConnecting] = useState(true);
+    const [aiResponse, setAIResponse] = useState<string>('');
      const searchParams = useSearchParams();
     const router = useRouter();
     const personality_id = searchParams.get('personality');
@@ -23,6 +25,7 @@ function CallContent() {
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsConnecting(false);
+            setAIResponse(`Hi, I'm ${personality?.name}. How can I help you today?`);
         }, 3000);
 
         const audio = new Audio('/call-sound.mp3');
@@ -34,7 +37,42 @@ function CallContent() {
             audio.pause();
             audio.currentTime = 0;
         };
-    }, []);
+    }, [personality?.name]);
+
+    const handleSpeechResult = async (text: string) => {
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messages: [{ content: text, sender: 'user' }],
+                    personality: personality
+                })
+            });
+
+            if (!response.body) {
+                throw new Error('No response body');
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let aiMessageContent = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                aiMessageContent += chunk;
+                setAIResponse(aiMessageContent);
+            }
+        } catch (error) {
+            console.error('Error getting AI response:', error);
+            setAIResponse('Sorry, I encountered an error. Please try again.');
+        }
+    };
 
     if (!personality) {
         return (
@@ -153,6 +191,11 @@ function CallContent() {
                     >
                         <Mic className="h-6 w-6" />
                     </Button>
+                    <CallAudio
+                        isMuted={isMuted}
+                        onSpeechResult={handleSpeechResult}
+                        onAIResponse={aiResponse}
+                    />
                     {!isMinimized && (
                         <>
                             <Button
