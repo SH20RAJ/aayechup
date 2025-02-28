@@ -18,10 +18,8 @@ interface Message {
     timestamp: Date;
 }
 
-interface ChatResponse {
-    message: string;
-    error?: string;
-}
+// Since ChatResponse interface is not used anywhere in the code,
+// we can safely remove it
 
 function ChatContent() {
     const [messages, setMessages] = useState<Message[]>([]);
@@ -43,9 +41,9 @@ function ChatContent() {
             sender: 'user',
             timestamp: new Date()
         };
-
+    
         setMessages(prev => [...prev, newMessage]);
-
+    
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
@@ -60,32 +58,53 @@ function ChatContent() {
                     personality: personality
                 })
             });
-
-            const data = await response.json() as ChatResponse;
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Failed to get AI response');
+    
+            if (!response.body) {
+                throw new Error('No response body');
             }
-
-            const aiResponse: Message = {
+    
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let aiMessageContent = '';
+    
+            const aiMessage: Message = {
                 id: (Date.now() + 1).toString(),
-                content: data.message,
+                content: '',
                 sender: 'ai',
                 timestamp: new Date()
             };
-
-            setMessages(prev => [...prev, aiResponse]);
+    
+            setMessages(prev => [...prev, aiMessage]);
+    
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+    
+                const chunk = decoder.decode(value, { stream: true });
+                aiMessageContent += chunk;
+    
+                setMessages(prev =>
+                    prev.map(msg =>
+                        msg.id === aiMessage.id
+                            ? { ...msg, content: aiMessageContent }
+                            : msg
+                    )
+                );
+            }
         } catch (error) {
             console.error('Error getting AI response:', error);
-            const errorMessage: Message = {
-                id: (Date.now() + 1).toString(),
-                content: 'Sorry, I encountered an error. Please try again.',
-                sender: 'ai',
-                timestamp: new Date()
-            };
-            setMessages(prev => [...prev, errorMessage]);
+            setMessages(prev => [
+                ...prev,
+                {
+                    id: (Date.now() + 1).toString(),
+                    content: 'Sorry, I encountered an error. Please try again.',
+                    sender: 'ai',
+                    timestamp: new Date()
+                }
+            ]);
         }
     };
+    
 
     const handleStartRecording = () => {
         setIsRecording(true);

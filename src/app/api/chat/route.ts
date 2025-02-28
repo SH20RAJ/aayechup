@@ -38,15 +38,16 @@ export async function POST(request: Request) {
         }
 
         const systemPrompt = personality
-            ? `You are ${personality.name}, ${personality.role + personality.description }. Your traits include being ${personality.traits.join(', ')}. Always stay in character and respond as ${personality.name} would, incorporating your role and personality traits naturally in your responses. Humanly responses.`
+            ? `You are ${personality.name}, ${personality.role} ${personality.description}. Your traits include being ${personality.traits.join(', ')}. Always stay in character and respond as ${personality.name} would, incorporating your role and personality traits naturally in your responses.`
             : 'You are a helpful AI assistant. Provide clear, accurate, and engaging responses.';
-        console.log(systemPrompt);
+
+        // console.log(systemPrompt);
 
         const response = await openai.chat.completions.create({
             model: 'deepseek-chat',
             messages: [
                 { role: 'system', content: systemPrompt },
-                ...messages.map((message: ChatMessage) => ({
+                ...messages.map((message) => ({
                     role: message.sender === 'user' ? 'user' : 'assistant',
                     content: message.content,
                 } as const)),
@@ -54,12 +55,24 @@ export async function POST(request: Request) {
             temperature: 0.8,
             max_tokens: 800,
             top_p: 0.9,
+            stream: true,
         });
 
-        return NextResponse.json({
-            message: response.choices[0].message.content,
+        const stream = new ReadableStream({
+            async start(controller) {
+                for await (const chunk of response) {
+                    if (chunk.choices[0]?.delta?.content) {
+                        controller.enqueue(chunk.choices[0].delta.content);
+                    }
+                }
+                controller.close();
+            },
         });
-    } catch (error: unknown) {
+
+        return new Response(stream, {
+            headers: { 'Content-Type': 'text/plain' },
+        });
+    } catch (error) {
         console.error('OpenAI API error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
