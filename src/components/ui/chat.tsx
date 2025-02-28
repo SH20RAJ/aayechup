@@ -6,6 +6,7 @@ import { Input } from './input';
 import { Send, Mic } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: string;
@@ -89,7 +90,11 @@ export function ChatUI({
                       <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-100" />
                       <span className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce delay-200" />
                     </span>
-                  ) : message.content}
+                  ) : (
+                    <ReactMarkdown >
+                      {message.content}
+                    </ReactMarkdown>
+                  )}
                 </p>
                 <span className="text-xs opacity-50">
                   {message.timestamp.toLocaleTimeString()}
